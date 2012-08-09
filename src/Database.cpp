@@ -333,7 +333,8 @@ void Database::UV_AfterQuery(uv_work_t* req) {
         // i dont think odbc will tell how many rows are returned, loop until out...
         while(true)
         {
-          Local<Object> tuple = Object::New();
+          //Local<Object> tuple = Object::New();
+          Local<Array> values = Array::New();
           ret = SQLFetch(self->m_hStmt);
           
           //TODO: Do something to enable/disable dumping these info messages to the console.
@@ -382,34 +383,43 @@ void Database::UV_AfterQuery(uv_work_t* req) {
             
             if(ret == SQL_NULL_DATA || len < 0)
             {
-              tuple->Set(String::New((const char *)columns[i].name), Null());
+              //tuple->Set(String::New((const char *)columns[i].name), Null());
+              values->Set(Integer::New(i), Null());
             }
             else
             {
               switch (columns[i].type) {
                 case SQL_NUMERIC :
-                  tuple->Set(String::New((const char *)columns[i].name), Number::New(atof(buf)));
+                  //tuple->Set(String::New((const char *)columns[i].name), Number::New(atof(buf)));
+                  values->Set(Integer::New(i), Number::New(atof(buf)));
                   break;
                 case SQL_DECIMAL :
-                  tuple->Set(String::New((const char *)columns[i].name), Number::New(atof(buf)));
+                  //tuple->Set(String::New((const char *)columns[i].name), Number::New(atof(buf)));
+                  values->Set(Integer::New(i), Number::New(atof(buf)));
                   break;
                 case SQL_INTEGER :
-                  tuple->Set(String::New((const char *)columns[i].name), Number::New(atof(buf)));
+                  //tuple->Set(String::New((const char *)columns[i].name), Number::New(atof(buf)));
+				  values->Set(Integer::New(i), Number::New(atof(buf)));
                   break;
                 case SQL_SMALLINT :
-                  tuple->Set(String::New((const char *)columns[i].name), Number::New(atof(buf)));
+                  //tuple->Set(String::New((const char *)columns[i].name), Number::New(atof(buf)));
+				  values->Set(Integer::New(i), Number::New(atof(buf)));
                   break;
                 case SQL_BIGINT :
-                  tuple->Set(String::New((const char *)columns[i].name), Number::New(atof(buf)));
+                  //tuple->Set(String::New((const char *)columns[i].name), Number::New(atof(buf)));
+                  values->Set(Integer::New(i), Number::New(atof(buf)));
                   break;
                 case SQL_FLOAT :
-                  tuple->Set(String::New((const char *)columns[i].name), Number::New(atof(buf)));
+                  //tuple->Set(String::New((const char *)columns[i].name), Number::New(atof(buf)));
+                  values->Set(Integer::New(i), Number::New(atof(buf)));
                   break;
                 case SQL_REAL :
-                  tuple->Set(String::New((const char *)columns[i].name), Number::New(atof(buf)));
+                  //tuple->Set(String::New((const char *)columns[i].name), Number::New(atof(buf)));
+                  values->Set(Integer::New(i), Number::New(atof(buf)));
                   break;
                 case SQL_DOUBLE :
-                  tuple->Set(String::New((const char *)columns[i].name), Number::New(atof(buf)));
+                  //tuple->Set(String::New((const char *)columns[i].name), Number::New(atof(buf)));
+                  values->Set(Integer::New(i), Number::New(atof(buf)));
                   break;
                 case SQL_DATETIME :
                 case SQL_TIMESTAMP :
@@ -418,21 +428,24 @@ void Database::UV_AfterQuery(uv_work_t* req) {
                   timeInfo.tm_isdst = -1; //a negative value means that mktime() should (use timezone information and system 
                         //databases to) attempt to determine whether DST is in effect at the specified time.
                   
-                  tuple->Set(String::New((const char *)columns[i].name), Date::New(double(mktime(&timeInfo)) * 1000));
-                  
+                  //tuple->Set(String::New((const char *)columns[i].name), Date::New(double(mktime(&timeInfo)) * 1000));
+                  values->Set(Integer::New(i), Date::New(double(mktime(&timeInfo)) * 1000));
                   break;
                 case SQL_BIT :
                   //again, i'm not sure if this is cross database safe, but it works for MSSQL
-                  tuple->Set(String::New((const char *)columns[i].name), Boolean::New( ( *buf == '0') ? false : true ));
+                  //tuple->Set(String::New((const char *)columns[i].name), Boolean::New( ( *buf == '0') ? false : true ));
+                  values->Set(Integer::New(i), Boolean::New( ( *buf == '0') ? false : true ));
                   break;
                 default :
-                  tuple->Set(String::New((const char *)columns[i].name), String::New(buf));
+                  //tuple->Set(String::New((const char *)columns[i].name), String::New(buf));
+                  values->Set(Integer::New(i), String::New(buf));
                   break;
               }
             }
           }
           
-          rows->Set(Integer::New(count), tuple);
+          //rows->Set(Integer::New(count), tuple);
+          rows->Set(Integer::New(count), values);
           count++;
         }
         
@@ -499,12 +512,12 @@ void Database::UV_Query(uv_work_t* req) {
   
   if(prep_req->dbo->m_hStmt)
   {
-	uv_mutex_lock(&Database::g_odbcMutex);
-	
+    uv_mutex_lock(&Database::g_odbcMutex);
+    
     SQLFreeHandle( SQL_HANDLE_STMT, prep_req->dbo->m_hStmt );
     SQLAllocHandle( SQL_HANDLE_STMT, prep_req->dbo->m_hDBC, &prep_req->dbo->m_hStmt );
-	
-	uv_mutex_unlock(&Database::g_odbcMutex);
+    
+    uv_mutex_unlock(&Database::g_odbcMutex);
   } 
 
   //check to see if should excute a direct or a parameter bound query
@@ -588,7 +601,7 @@ Handle<Value> Database::Query(const Arguments& args) {
                       String::New("Argument 2 must be a Function"))
            );
       }
-  
+
 
       Local<Array> values = Local<Array>::Cast(args[1]);
       cb = Local<Function>::Cast(args[2]);

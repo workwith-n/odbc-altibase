@@ -415,10 +415,12 @@ void Database::UV_AfterQuery(uv_work_t* req) {
                   value = *Date::New(double(mktime(&timeInfo)) * 1000);
                   break;
                 case SQL_BIT :
-printf("bit: [%s]\n", buf);
                   //again, i'm not sure if this is cross database safe, but it works for MSSQL
                   //tuple->Set(String::New((const char *)columns[i].name), Boolean::New( ( *buf == '0') ? false : true ));
                   //values->Set(Integer::New(i), Boolean::New( ( *buf == '0') ? false : true ));
+//ret = SQLGetData(self->m_hStmt, i+1, SQL_BIT, (char *) buf, MAX_VALUE_SIZE-1, (SQLLEN *) &len);
+//printf("bit: [%s]\n", buf);
+
                   value = *Boolean::New( ( *buf == '0') ? false : true );
                   break;
                 default :

@@ -378,7 +378,7 @@ void Database::UV_AfterQuery(uv_work_t* req) {
           for(int i = 0; i < colCount; i++)
           {
             SQLLEN len;
-            
+            Local<Value> value;
             // SQLGetData can supposedly return multiple chunks, need to do this to retrieve large fields
             int ret = SQLGetData(self->m_hStmt, i+1, SQL_CHAR, (char *) buf, MAX_VALUE_SIZE-1, (SQLLEN *) &len);
             
@@ -387,42 +387,21 @@ void Database::UV_AfterQuery(uv_work_t* req) {
             if(ret == SQL_NULL_DATA || len < 0)
             {
               //tuple->Set(String::New((const char *)columns[i].name), Null());
-              values->Set(Integer::New(i), Null());
+              //values->Set(Integer::New(i), Null());
+              value = *Null();
             }
             else
             {
               switch (columns[i].type) {
                 case SQL_NUMERIC :
-                  //tuple->Set(String::New((const char *)columns[i].name), Number::New(atof(buf)));
-                  values->Set(Integer::New(i), Number::New(atof(buf)));
-                  break;
                 case SQL_DECIMAL :
-                  //tuple->Set(String::New((const char *)columns[i].name), Number::New(atof(buf)));
-                  values->Set(Integer::New(i), Number::New(atof(buf)));
-                  break;
                 case SQL_INTEGER :
-                  //tuple->Set(String::New((const char *)columns[i].name), Number::New(atof(buf)));
-				  values->Set(Integer::New(i), Number::New(atof(buf)));
-                  break;
                 case SQL_SMALLINT :
-                  //tuple->Set(String::New((const char *)columns[i].name), Number::New(atof(buf)));
-				  values->Set(Integer::New(i), Number::New(atof(buf)));
-                  break;
                 case SQL_BIGINT :
-                  //tuple->Set(String::New((const char *)columns[i].name), Number::New(atof(buf)));
-                  values->Set(Integer::New(i), Number::New(atof(buf)));
-                  break;
                 case SQL_FLOAT :
-                  //tuple->Set(String::New((const char *)columns[i].name), Number::New(atof(buf)));
-                  values->Set(Integer::New(i), Number::New(atof(buf)));
-                  break;
                 case SQL_REAL :
-                  //tuple->Set(String::New((const char *)columns[i].name), Number::New(atof(buf)));
-                  values->Set(Integer::New(i), Number::New(atof(buf)));
-                  break;
                 case SQL_DOUBLE :
-                  //tuple->Set(String::New((const char *)columns[i].name), Number::New(atof(buf)));
-                  values->Set(Integer::New(i), Number::New(atof(buf)));
+                  value = *Number::New(atof(buf));
                   break;
                 case SQL_DATETIME :
                 case SQL_TIMESTAMP :
@@ -432,19 +411,26 @@ void Database::UV_AfterQuery(uv_work_t* req) {
                         //databases to) attempt to determine whether DST is in effect at the specified time.
                   
                   //tuple->Set(String::New((const char *)columns[i].name), Date::New(double(mktime(&timeInfo)) * 1000));
-                  values->Set(Integer::New(i), Date::New(double(mktime(&timeInfo)) * 1000));
+                  //values->Set(Integer::New(i), Date::New(double(mktime(&timeInfo)) * 1000));
+                  value = *Date::New(double(mktime(&timeInfo)) * 1000);
                   break;
                 case SQL_BIT :
+printf("bit: [%s]\n", buf);
                   //again, i'm not sure if this is cross database safe, but it works for MSSQL
                   //tuple->Set(String::New((const char *)columns[i].name), Boolean::New( ( *buf == '0') ? false : true ));
-                  values->Set(Integer::New(i), Boolean::New( ( *buf == '0') ? false : true ));
+                  //values->Set(Integer::New(i), Boolean::New( ( *buf == '0') ? false : true ));
+                  value = *Boolean::New( ( *buf == '0') ? false : true );
                   break;
                 default :
                   //tuple->Set(String::New((const char *)columns[i].name), String::New(buf));
-                  values->Set(Integer::New(i), String::New(buf));
+                  //values->Set(Integer::New(i), String::New(buf));
+                  value = *String::New(buf);
                   break;
               }
             }
+            
+            //TODO: check if we are doing duples or arrays
+            values->Set(Integer::New(i), value);
           }
           
           //rows->Set(Integer::New(count), tuple);

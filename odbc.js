@@ -79,14 +79,30 @@ Database.prototype.query = function(sql, params, callback) {
     args.push(params);  
   }
 
-  args.push(function (error, rows, morefollowing) {
+  args.push(function (error, rows, morefollowing, columns) {
+    var newRows = new Array(rows.length)
+        , args = Array.prototype.slice.call(arguments)
+        ;
+
     //check to see if this is the last result set returned
     if (!morefollowing) {
       self.queue.shift();
       self.executing = false;
     }
 
-    if (callback) callback.apply(self, arguments);
+    //create array of record objects
+    rows.forEach(function (row, rowIndex) {
+        var obj = {};
+        newRows[rowIndex] = obj;
+
+        columns.forEach(function (column, colIndex) {
+            obj[column] = row[colIndex];
+        });
+    });
+
+    args[1] = newRows;
+
+    if (callback) callback.apply(self, args);
 
     self.processQueue();
   });

@@ -308,7 +308,8 @@ void Database::UV_AfterQuery(uv_work_t* req) {
       Column *columns = new Column[colCount];
       
       Local<Array> rows = Array::New();
-      
+      Local<Array> columnNames = Array::New();
+	  
       if (colCount > 0) {
         // retrieve and store column attributes to build the row object
         for(int i = 0; i < colCount; i++)
@@ -326,6 +327,8 @@ void Database::UV_AfterQuery(uv_work_t* req) {
           
           //get the column type and store it directly in column[i].type
           ret = SQLColAttribute( self->m_hStmt, (SQLUSMALLINT)i+1, SQL_COLUMN_TYPE, NULL, 0, NULL, &columns[i].type );
+ 
+          columnNames->Set(Integer::New(i), String::New((const char *)columns[i].name));
         }
         
         int count = 0;
@@ -466,7 +469,7 @@ void Database::UV_AfterQuery(uv_work_t* req) {
       if (colCount > 0 || ( ret != SQL_SUCCESS && emitCount == 0 )) {
         emitCount++;
         
-        Local<Value> args[3];
+        Local<Value> args[4];
         
         if (errorCount) {
           args[0] = objError;
@@ -477,8 +480,9 @@ void Database::UV_AfterQuery(uv_work_t* req) {
         
         args[1] = rows;
         args[2] = Local<Boolean>::New(( ret == SQL_SUCCESS ) ? True() : False() ); //true or false, are there more result sets to follow this emit?
+        args[3] = columnNames;
         
-        prep_req->cb->Call(Context::GetCurrent()->Global(), 3, args);
+        prep_req->cb->Call(Context::GetCurrent()->Global(), 4, args);
       }
     }
     while ( self->canHaveMoreResults && ret == SQL_SUCCESS );

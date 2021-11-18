@@ -1,31 +1,14 @@
 {
-  "name": "odbc",
-  "description": "unixodbc bindings for node",
-  "version": "2.4.1",
-  "homepage": "http://github.com/markdirish/node-odbc/",
+  "name": "odbc-altibase",
+  "description": "unixodbc bindings for node - Altibase",
+  "version": "0.0.1",
   "main": "lib/odbc.js",
   "types": "lib/odbc.d.ts",
+  "author": "lawrence <workwith.n@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "git://github.com/markdirish/node-odbc.git"
+    "url": "git://github.com/workwith-n/odbc-altibase.git"
   },
-  "bugs": {
-    "url": "https://github.com/markdirish/node-odbc/issues"
-  },
-  "contributors": [
-    {
-      "name": "Mark Irish",
-      "email": "mirish@ibm.com"
-    },
-    {
-      "name": "Dan VerWeire",
-      "email": "dverweire@gmail.com"
-    },
-    {
-      "name": "Lee Smith",
-      "email": "notwink@gmail.com"
-    }
-  ],
   "license": "MIT",
   "directories": {
     "lib": "."

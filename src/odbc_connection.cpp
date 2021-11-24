@@ -1810,8 +1810,6 @@ class CallProcedureAsyncWorker : public ODBCAsyncWorker {
       data->deleteColumns(); // delete data in columns for next result set
 
       data->sql = new SQLTCHAR[255]();
-      printf("[odbc] " + combinedProcedureName + "\0");
-      printf("[odbc] " + parameterString + "\0");
       sprintf((char *)data->sql, " EXEC %s (%s) ", combinedProcedureName, parameterString);
 
       delete[] combinedProcedureName;
@@ -1830,6 +1828,8 @@ class CallProcedureAsyncWorker : public ODBCAsyncWorker {
       );
       if (!SQL_SUCCEEDED(return_code)) {
         this->errors = GetODBCErrors(SQL_HANDLE_STMT, data->hstmt);
+        SetError(combinedProcedureName);
+        SetError(parameterString);
         SetError("[odbc] Error calling the procedure\0");
         return;
       }

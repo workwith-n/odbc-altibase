@@ -1828,8 +1828,6 @@ class CallProcedureAsyncWorker : public ODBCAsyncWorker {
       );
       if (!SQL_SUCCEEDED(return_code)) {
         this->errors = GetODBCErrors(SQL_HANDLE_STMT, data->hstmt);
-        SetError(combinedProcedureName);
-        SetError(parameterString);
         SetError("[odbc] Error calling the procedure\0");
         return;
       }

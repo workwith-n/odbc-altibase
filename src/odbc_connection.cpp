@@ -1810,7 +1810,8 @@ class CallProcedureAsyncWorker : public ODBCAsyncWorker {
       data->deleteColumns(); // delete data in columns for next result set
 
       data->sql = new SQLTCHAR[255]();
-      sprintf((char *)data->sql, "{ CALL %s (%s) }", combinedProcedureName, parameterString);
+      //sprintf((char *)data->sql, "{ call %s (%s) }", combinedProcedureName, parameterString);
+      sprintf((char *)data->sql, "{ call %s (%s) }", combinedProcedureName, parameterString);
 
       delete[] combinedProcedureName;
       delete[] parameterString;

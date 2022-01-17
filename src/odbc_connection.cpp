@@ -2912,6 +2912,8 @@ bind_buffers
 
       case SQL_REAL:
       case SQL_DECIMAL:
+      case SQL_FLOAT:
+      case SQL_DOUBLE:
       case SQL_NUMERIC:
       {
         size_t character_count = column->ColumnSize + 2;
@@ -2922,15 +2924,15 @@ bind_buffers
         break;
       }
 
-      case SQL_FLOAT:
-      case SQL_DOUBLE:
-      {
-        column->buffer_size = sizeof(SQLDOUBLE);
-        column->bind_type = SQL_C_DOUBLE;
-        data->bound_columns[i].buffer =
-          new SQLDOUBLE[data->fetch_size]();
-        break;
-      }
+//      case SQL_FLOAT:
+//      case SQL_DOUBLE:
+//      {
+//        column->buffer_size = sizeof(SQLDOUBLE);
+//        column->bind_type = SQL_C_DOUBLE;
+//        data->bound_columns[i].buffer =
+//          new SQLDOUBLE[data->fetch_size]();
+//        break;
+//      }
 
       case SQL_TINYINT:
       {

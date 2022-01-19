@@ -2827,7 +2827,7 @@ bind_buffers
     data->bound_columns[i].length_or_indicator_array =
       new SQLLEN[data->fetch_size]();
 
-    return_code = 
+    return_code =
     SQLDescribeCol
     (
       data->hstmt,                   // StatementHandle
@@ -2914,7 +2914,7 @@ bind_buffers
       case SQL_DECIMAL:
       case SQL_FLOAT:
       case SQL_DOUBLE:
-      case SQL_BIGINT:
+//      case SQL_BIGINT:
       case SQL_NUMERIC:
       {
         size_t character_count = column->ColumnSize + 2;
@@ -2962,14 +2962,14 @@ bind_buffers
         break;
       }
 
-//      case SQL_BIGINT:
-//      {
-//        column->buffer_size = sizeof(SQLBIGINT);
-//        column->bind_type = SQL_C_SBIGINT;
-//        data->bound_columns[i].buffer =
-//          new SQLBIGINT[data->fetch_size]();
-//        break;
-//      }
+      case SQL_BIGINT:
+      {
+        column->buffer_size = sizeof(SQLBIGINT);
+        column->bind_type = SQL_C_SBIGINT;
+        data->bound_columns[i].buffer =
+          new SQLBIGINT[data->fetch_size]();
+        break;
+      }
 
       case SQL_BINARY:
       case SQL_VARBINARY:
